@@ -17,9 +17,9 @@ templ_pg_cmd = Template(
     "${prefix}/bin/postgres -D ${prefix}/var/lib/postgres")
 templ_pg_cmds = Template(
 """
-      createuser -p ${port} --createdb --no-createrole --no-superuser --login adaguc
-      createdb -p ${port} --owner=adaguc adaguc
-      createdb -p ${port}
+createuser -p ${port} --createdb --no-createrole --no-superuser --login adaguc
+createdb -p ${port} --owner=adaguc adaguc
+createdb -p ${port}
 """)
 
 class Recipe(object):
