@@ -18,7 +18,6 @@ This recipe is used by the `Birdhouse`_ project.
 .. _`Supervisor`: http://supervisord.org/
 .. _`Nginx`: http://nginx.org/
 .. _`Adagucserver`: https://dev.knmi.nl/projects/adagucserver/wiki
-.. _`Web Processing Service`: https://en.wikipedia.org/wiki/Web_Processing_Service
 .. _`Birdhouse`: http://bird-house.github.io/
 
 
