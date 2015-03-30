@@ -5,8 +5,7 @@
 import os
 from mako.template import Template
 
-from birdhousebuilder.recipe import conda, supervisor, nginx
-from makina.recipe import postgres
+from birdhousebuilder.recipe import conda, supervisor, nginx, postgres
 
 templ_app = Template(filename=os.path.join(os.path.dirname(__file__), "adagucserver.py"))
 templ_autowms = Template(filename=os.path.join(os.path.dirname(__file__), "autowms.xml"))
