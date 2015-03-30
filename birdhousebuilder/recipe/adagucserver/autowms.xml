@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Configuration>
 
-  {% python
+  <%
     from os.path import realpath
     def basedir():
         return realpath(options['data_dir'])
-  %}
+  %>
 
   <!-- General settings -->
   <Path value="${options['prefix']}/share/adagucserver/"/>
