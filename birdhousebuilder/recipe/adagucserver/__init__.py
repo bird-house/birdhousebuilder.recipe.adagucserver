@@ -42,7 +42,7 @@ class Recipe(object):
 
         self.options['online_resource'] = 'http://%s:%s/?' % (self.hostname, self.port)
         self.options['font'] = os.path.join(b_options['anaconda-home'], 'share','adagucserver','fonts', 'FreeSans.ttf')
-        self.options['db_params'] = 'dbname=adaguc host=127.0.0.1 port=postgres-port user=adaguc password='
+        self.options['db_params'] = 'dbname=adaguc host=127.0.0.1 port=%s user=adaguc password=' % (self.options['postgres-port'])
         self.options['data_dir'] = os.path.join(self.prefix, 'var', 'cache', 'pywps')
               
     def install(self):
@@ -50,9 +50,9 @@ class Recipe(object):
         installed += list(self.install_pkgs())
         installed += list(self.install_app())
         installed += list(self.install_config())
+        installed += list(self.install_postgres())
         installed += list(self.install_pg_config())
         installed += list(self.install_pg_supervisor())
-        installed += list(self.install_postgres())
         installed += list(self.install_gunicorn())
         installed += list(self.install_supervisor())
         installed += list(self.install_nginx())
@@ -102,10 +102,27 @@ class Recipe(object):
             fp.write(result)
         return [output]
 
+    def install_postgres(self, update=False):
+        script = postgres.Recipe(
+            self.buildout,
+            'adaguc',
+            {
+                'bin': os.path.join(self.prefix, 'bin'),
+                'initdb': '--auth=trust --pgdata=%s/var/lib/postgres' % (self.prefix),
+                'pgdata': '%s/var/lib/postgres' % (self.prefix),
+                'cmds': templ_pg_cmds.render(port=self.options['postgres-port'])
+            })
+        if update == True:
+            script.update()
+        else:
+            script.install()
+        return tuple()
+
     def install_pg_config(self):
         result = templ_pg_config.render(port=self.options['postgres-port'])
         output = os.path.join(self.prefix, 'var', 'lib', 'postgres', 'postgresql.conf')
         conda.makedirs(os.path.dirname(output))
+        os.chmod(output, 0700)
                 
         try:
             os.remove(output)
@@ -124,22 +141,6 @@ class Recipe(object):
              'command': templ_pg_cmd.render(prefix=self.prefix),
              'directory': os.path.join(self.prefix, 'var', 'lib', 'postgres')
              })
-        if update == True:
-            script.update()
-        else:
-            script.install()
-        return tuple()
-
-    def install_postgres(self, update=False):
-        script = postgres.Recipe(
-            self.buildout,
-            'adagucserver',
-            {
-                'bin': os.path.join(self.prefix, 'bin'),
-                'initdb': '--auth=trust --pgdata=%s/var/lib/postgres' % (self.prefix),
-                'pgdata': '%s/var/lib/postgres' % (self.prefix),
-                'cmds': templ_pg_cmds.render(port=self.options['postgres-port'])
-            })
         if update == True:
             script.update()
         else:
@@ -198,9 +199,9 @@ class Recipe(object):
     def update(self):
         self.install_config()
         self.install_app()
+        self.install_postgres(update=True)
         self.install_pg_config()
         self.install_pg_supervisor(update=True)
-        self.install_postgres(update=True)
         self.install_gunicorn()
         self.install_supervisor(update=True)
         self.install_nginx(update=True)
