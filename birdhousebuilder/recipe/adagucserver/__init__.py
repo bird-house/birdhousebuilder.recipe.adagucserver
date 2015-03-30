@@ -12,6 +12,9 @@ templ_autowms = Template(filename=os.path.join(os.path.dirname(__file__), "autow
 templ_gunicorn = Template(filename=os.path.join(os.path.dirname(__file__), "gunicorn.conf.py"))
 templ_cmd = Template(
     "${prefix}/bin/gunicorn adagucserver:app -c ${prefix}/etc/gunicorn/adagucserver.py")
+templ_pg_config = Template(filename=os.path.join(os.path.dirname(__file__), "postgresql.conf"))
+templ_pg_cmd = Template(
+    "${prefix}/bin/postgres -D ${prefix}/var/lib/postgres")
 
 class Recipe(object):
     """This recipe is used by zc.buildout"""
@@ -28,6 +31,8 @@ class Recipe(object):
         self.port = options.get('port', '9002')
         self.options['port'] = self.port
 
+        self.options['postgres-port'] = self.options.get('postgres-port', '5433')
+
         self.options['online_resource'] = 'http://%s:%s/?' % (self.hostname, self.port)
         self.options['font'] = os.path.join(b_options['anaconda-home'], 'share','adagucserver','fonts', 'FreeSans.ttf')
         self.options['db_params'] = 'dbname=adaguc host=127.0.0.1 port=postgres-port user=adaguc password='
@@ -38,6 +43,8 @@ class Recipe(object):
         installed += list(self.install_pkgs())
         installed += list(self.install_app())
         installed += list(self.install_config())
+        installed += list(self.install_pg_config())
+        installed += list(self.install_pg_supervisor())
         installed += list(self.install_gunicorn())
         installed += list(self.install_supervisor())
         installed += list(self.install_nginx())
@@ -87,9 +94,37 @@ class Recipe(object):
             fp.write(result)
         return [output]
 
+    def install_pg_config(self):
+        result = templ_pg_config.render(port=self.options['postgres-port'])
+        output = os.path.join(self.prefix, 'var', 'lib', 'postgres', 'postgresql.conf')
+        conda.makedirs(os.path.dirname(output))
+                
+        try:
+            os.remove(output)
+        except OSError:
+            pass
+
+        with open(output, 'wt') as fp:
+            fp.write(result)
+        return [output]
+
+    def install_pg_supervisor(self, update=False):
+        script = supervisor.Recipe(
+            self.buildout,
+            'postgres',
+            {'program': 'postgres',
+             'command': templ_pg_cmd.render(prefix=self.prefix),
+             'directory': os.path.join(self.prefix, 'var', 'lib', 'postgres')
+             })
+        if update == True:
+            script.update()
+        else:
+            script.install()
+        return tuple()
+
     def install_gunicorn(self):
         """
-        install etc/gunicorn.conf.py
+        install etc/gunicorn/adagucserver.py
         """
         result = templ_gunicorn.render(
             prefix=self.prefix,
@@ -139,6 +174,8 @@ class Recipe(object):
     def update(self):
         self.install_config()
         self.install_app()
+        self.install_pg_config()
+        self.install_pg_supervisor(update=True)
         self.install_gunicorn()
         self.install_supervisor(update=True)
         self.install_nginx(update=True)
