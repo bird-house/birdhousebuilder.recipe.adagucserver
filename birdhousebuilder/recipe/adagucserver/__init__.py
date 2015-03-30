@@ -41,7 +41,7 @@ class Recipe(object):
         self.options['postgres-port'] = self.options.get('postgres-port', '5433')
 
         self.options['online_resource'] = 'http://%s:%s/?' % (self.hostname, self.port)
-        self.options['font'] = os.path.join(b_options['anaconda-home'], 'share','adagucserver','fonts', 'FreeSans.ttf')
+        self.options['font'] = os.path.join(self.prefix, 'share','adagucserver','fonts', 'FreeSans.ttf')
         self.options['db_params'] = 'dbname=adaguc host=127.0.0.1 port=%s user=adaguc password=' % (self.options['postgres-port'])
         self.options['data_dir'] = os.path.join(self.prefix, 'var', 'cache', 'pywps')
               
