@@ -6,6 +6,7 @@ import os
 from mako.template import Template
 
 from birdhousebuilder.recipe import conda, supervisor, nginx
+from makina.recipe import postgres
 
 templ_app = Template(filename=os.path.join(os.path.dirname(__file__), "adagucserver.py"))
 templ_autowms = Template(filename=os.path.join(os.path.dirname(__file__), "autowms.xml"))
@@ -15,6 +16,12 @@ templ_cmd = Template(
 templ_pg_config = Template(filename=os.path.join(os.path.dirname(__file__), "postgresql.conf"))
 templ_pg_cmd = Template(
     "${prefix}/bin/postgres -D ${prefix}/var/lib/postgres")
+templ_pg_cmds = Template(
+"""
+      createuser -p ${port} --createdb --no-createrole --no-superuser --login adaguc
+      createdb -p ${port} --owner=adaguc adaguc
+      createdb -p ${port}
+""")
 
 class Recipe(object):
     """This recipe is used by zc.buildout"""
@@ -45,6 +52,7 @@ class Recipe(object):
         installed += list(self.install_config())
         installed += list(self.install_pg_config())
         installed += list(self.install_pg_supervisor())
+        installed += list(self.install_postgres())
         installed += list(self.install_gunicorn())
         installed += list(self.install_supervisor())
         installed += list(self.install_nginx())
@@ -122,6 +130,22 @@ class Recipe(object):
             script.install()
         return tuple()
 
+    def install_postgres(self, update=False):
+        script = postgres.Recipe(
+            self.buildout,
+            'adagucserver',
+            {
+                'bin': os.path.join(self.prefix, 'bin'),
+                'initdb': '--auth=trust --pgdata=%s/var/lib/postgres' % (self.prefix),
+                'pgdata': '%s/var/lib/postgres' % (self.prefix),
+                'cmds': templ_pg_cmds.render(port=self.options['postgres-port'])
+            })
+        if update == True:
+            script.update()
+        else:
+            script.install()
+        return tuple()
+    
     def install_gunicorn(self):
         """
         install etc/gunicorn/adagucserver.py
@@ -176,6 +200,7 @@ class Recipe(object):
         self.install_app()
         self.install_pg_config()
         self.install_pg_supervisor(update=True)
+        self.install_postgres(update=True)
         self.install_gunicorn()
         self.install_supervisor(update=True)
         self.install_nginx(update=True)
