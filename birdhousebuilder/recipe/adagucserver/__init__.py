@@ -101,7 +101,6 @@ class Recipe(object):
             self.buildout,
             'adaguc',
             {
-                'bin': os.path.join(self.prefix, 'bin'),
                 'port': self.options['postgres-port'],
                 'cmds': templ_pg_cmds.render(port=self.options['postgres-port'])
             })
