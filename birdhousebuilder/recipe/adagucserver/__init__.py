@@ -102,8 +102,6 @@ class Recipe(object):
             'adaguc',
             {
                 'bin': os.path.join(self.prefix, 'bin'),
-                'initdb': '--auth=trust --pgdata=%s/var/lib/postgres' % (self.prefix),
-                'pgdata': '%s/var/lib/postgres' % (self.prefix),
                 'port': self.options['postgres-port'],
                 'cmds': templ_pg_cmds.render(port=self.options['postgres-port'])
             })
