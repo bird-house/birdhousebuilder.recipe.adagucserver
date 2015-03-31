@@ -12,9 +12,6 @@ templ_autowms = Template(filename=os.path.join(os.path.dirname(__file__), "autow
 templ_gunicorn = Template(filename=os.path.join(os.path.dirname(__file__), "gunicorn.conf.py"))
 templ_cmd = Template(
     "${prefix}/bin/gunicorn adagucserver:app -c ${prefix}/etc/gunicorn/adagucserver.py")
-templ_pg_config = Template(filename=os.path.join(os.path.dirname(__file__), "postgresql.conf"))
-templ_pg_cmd = Template(
-    "${prefix}/bin/postgres -D ${prefix}/var/lib/postgres")
 templ_pg_cmds = Template(
 """
 createuser -p ${port} --createdb --no-createrole --no-superuser --login adaguc
@@ -50,8 +47,6 @@ class Recipe(object):
         installed += list(self.install_app())
         installed += list(self.install_config())
         installed += list(self.install_postgres())
-        installed += list(self.install_pg_config())
-        installed += list(self.install_pg_supervisor())
         installed += list(self.install_gunicorn())
         installed += list(self.install_supervisor())
         installed += list(self.install_nginx())
@@ -116,36 +111,7 @@ class Recipe(object):
         else:
             script.install()
         return tuple()
-
-    def install_pg_config(self):
-        result = templ_pg_config.render(port=self.options['postgres-port'])
-        output = os.path.join(self.prefix, 'var', 'lib', 'postgres', 'postgresql.conf')
-        conda.makedirs(os.path.dirname(output))
-        os.chmod(output, 0700)
-                
-        try:
-            os.remove(output)
-        except OSError:
-            pass
-
-        with open(output, 'wt') as fp:
-            fp.write(result)
-        return [output]
-
-    def install_pg_supervisor(self, update=False):
-        script = supervisor.Recipe(
-            self.buildout,
-            'postgres',
-            {'program': 'postgres',
-             'command': templ_pg_cmd.render(prefix=self.prefix),
-             'directory': os.path.join(self.prefix, 'var', 'lib', 'postgres')
-             })
-        if update == True:
-            script.update()
-        else:
-            script.install()
-        return tuple()
-    
+ 
     def install_gunicorn(self):
         """
         install etc/gunicorn/adagucserver.py
