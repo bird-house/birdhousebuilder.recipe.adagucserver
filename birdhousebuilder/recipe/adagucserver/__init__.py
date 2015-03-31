@@ -61,7 +61,7 @@ class Recipe(object):
         script = conda.Recipe(
             self.buildout,
             self.name,
-            {'pkgs': 'adagucserver gunicorn postgresql'})
+            {'pkgs': 'adagucserver gunicorn'})
         
         #mypath = os.path.join(self.prefix, 'var', 'lib', 'pywps', 'outputs', self.sites)
         #conda.makedirs(mypath)
