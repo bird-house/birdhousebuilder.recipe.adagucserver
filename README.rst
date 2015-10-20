@@ -35,7 +35,6 @@ By default ``Adagucserver`` will be available on http://localhost:9002?service=W
 The recipe depends on:
  
 * ``birdhousebuilder.recipe.conda`` 
-* ``birdhousebuilder.recipe.postgres``
 * ``birdhousebuilder.recipe.supervisor``
 * ``birdhousebuilder.recipe.nginx``
 
