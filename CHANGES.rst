@@ -1,10 +1,15 @@
 Change History
 **************
 
+0.3.0 (2015-10-dd)
+==================
+
+* update to adagucserver 1.9.3 with sqlite
+
 0.2.1 (2015-03-31)
 ==================
 
-Fixed update mode.
+* Fixed update mode.
 
 0.2.0 (2015-03-31)
 ==================

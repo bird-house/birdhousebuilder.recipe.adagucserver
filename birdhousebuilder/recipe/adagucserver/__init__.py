@@ -5,7 +5,7 @@
 import os
 from mako.template import Template
 
-from birdhousebuilder.recipe import conda, supervisor, nginx, postgres
+from birdhousebuilder.recipe import conda, supervisor, nginx
 
 templ_app = Template(filename=os.path.join(os.path.dirname(__file__), "adagucserver.py"))
 templ_autowms = Template(filename=os.path.join(os.path.dirname(__file__), "autowms.xml"))
@@ -34,11 +34,9 @@ class Recipe(object):
         self.port = options.get('port', '9002')
         self.options['port'] = self.port
 
-        self.options['postgres-port'] = self.options.get('postgres-port', '5433')
-
         self.options['online_resource'] = 'http://%s:%s/?' % (self.hostname, self.port)
         self.options['font'] = os.path.join(self.prefix, 'share','adagucserver','fonts', 'FreeSans.ttf')
-        self.options['db_params'] = 'dbname=adaguc host=127.0.0.1 port=%s user=adaguc password=' % (self.options['postgres-port'])
+        self.options['db_params'] = 'databasefile.db'
         self.options['data_dir'] = os.path.join(self.prefix, 'var', 'cache', 'pywps')
               
     def install(self, update=False):
@@ -46,7 +44,6 @@ class Recipe(object):
         installed += list(self.install_pkgs(update))
         installed += list(self.install_app())
         installed += list(self.install_config())
-        installed += list(self.install_postgres(update))
         installed += list(self.install_gunicorn())
         installed += list(self.install_supervisor(update))
         installed += list(self.install_nginx(update))
@@ -95,20 +92,6 @@ class Recipe(object):
         with open(output, 'wt') as fp:
             fp.write(result)
         return [output]
-
-    def install_postgres(self, update=False):
-        script = postgres.Recipe(
-            self.buildout,
-            'adaguc',
-            {
-                'port': self.options['postgres-port'],
-                'cmds': templ_pg_cmds.render(port=self.options['postgres-port'])
-            })
-        if update == True:
-            script.update()
-        else:
-            script.install()
-        return tuple()
  
     def install_gunicorn(self):
         """
