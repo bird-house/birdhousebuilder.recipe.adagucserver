@@ -2,11 +2,17 @@ import os
 
 def parse_output(output):
     lines = output.split('\n')
-    content_type = "text/plain"
-    if 'Content-Type' in lines[0]:
-        content_type = lines[0].split(':')[1]
-        content_type = content_type.strip()
-    data = '\n'.join(lines[2:-1])
+    content_type = "text/xml"
+    data = '\n'.join(lines)
+    for i,line in enumerate(lines):
+        if 'Content-Type' in line:
+            content_type = line.split(':')[1]
+            content_type = content_type.strip()
+            start_line = i+1
+            break
+    for i,line in enumerate(lines):
+        if line.startswith('<?xml'):
+            data = '\n'.join(lines[i:-1])
     return content_type,data
 
 def app(environ, start_response):
