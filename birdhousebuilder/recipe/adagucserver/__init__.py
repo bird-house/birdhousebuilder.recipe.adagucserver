@@ -12,12 +12,6 @@ templ_autowms = Template(filename=os.path.join(os.path.dirname(__file__), "autow
 templ_gunicorn = Template(filename=os.path.join(os.path.dirname(__file__), "gunicorn.conf.py"))
 templ_cmd = Template(
     "${prefix}/bin/gunicorn adagucserver:app -c ${prefix}/etc/gunicorn/adagucserver.py")
-templ_pg_cmds = Template(
-"""
-createuser -p ${port} --createdb --no-createrole --no-superuser --login adaguc
-createdb -p ${port} --owner=adaguc adaguc
-createdb -p ${port}
-""")
 
 class Recipe(object):
     """This recipe is used by zc.buildout"""
@@ -34,10 +28,13 @@ class Recipe(object):
         self.port = options.get('port', '9002')
         self.options['port'] = self.port
 
+        self.options['title'] = self.options.get('title', 'Birdhouse ADAGUC WMS')
+        self.options['abstract'] = self.options.get('abstract', 'ADAGUC Web Map Service used in Birdhouse')
         self.options['online_resource'] = 'http://%s:%s/?' % (self.hostname, self.port)
         self.options['font'] = os.path.join(self.prefix, 'share','adagucserver','fonts', 'FreeSans.ttf')
         self.options['db_params'] = 'databasefile.db'
-        self.options['data_dir'] = os.path.join(self.prefix, 'var', 'cache', 'pywps')
+        self.options['data_dir'] = os.path.join(self.prefix, 'var', 'lib', 'pywps', 'outputs')
+        self.options['enablecache'] = self.options.get('enablecache', 'false')
               
     def install(self, update=False):
         installed = []
@@ -80,7 +77,12 @@ class Recipe(object):
         """
         install adagucserver config in etc/adagucserver
         """
-        result = templ_autowms.render(options=self.options)
+
+        # setup configured dirs
+        conda.makedirs(os.path.join(self.prefix, 'var', 'cache', 'adagucserver'))
+
+        # generate config
+        result = templ_autowms.render(**self.options)
         output = os.path.join(self.prefix, 'etc', 'adagucserver', 'autowms.xml')
         conda.makedirs(os.path.dirname(output))
                 

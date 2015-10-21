@@ -4,31 +4,32 @@
   <%
     from os.path import realpath
     def basedir():
-        return realpath(options['data_dir'])
+        return realpath(data_dir)
   %>
 
   <!-- General settings -->
-  <Path value="${options['prefix']}/share/adagucserver/"/>
-  <TempDir value="${options['prefix']}/var/tmp/"/>
-  <OnlineResource value="${options['online_resource']}"/>
-  <DataBase dbtype="sqlite" parameters="${options['db_params']}"/>
-  <AutoResource enableautoopendap="true" enablelocalfile="true" enablecache="false" >
+  <Path value="${prefix}/share/adagucserver/"/>
+  <TempDir value="${prefix}/var/cache/adagucserver"/>
+  <OnlineResource value="${online_resource}"/>
+  <DataBase dbtype="sqlite" parameters="${db_params}"/>
+  <CacheDocs enabled="${enablecache}"/>
+  <AutoResource enableautoopendap="true" enablelocalfile="true" enablecache="${enablecache}" >
     <Dir basedir="${basedir()}" prefix="${basedir()}"/>
   </AutoResource>
 
   <!-- WMS settings -->
   <WMS>
-    <Title>adaguc autowms</Title>
-    <Abstract>This service demonstrates how the ADAGUC server can be used to create OGC services.</Abstract>
+    <Title>${title}</Title>
+    <Abstract>${abstract}</Abstract>
     <RootLayer>
       <Title>ADAGUC</Title>
       <Abstract></Abstract>
     </RootLayer>
-    <TitleFont location="${options['font']}" size="19"/>
-    <SubTitleFont location="${options['font']}" size="10"/>
-    <DimensionFont location="${options['font']}" size="7"/>
-    <ContourFont location="${options['font']}" size="7"/>
-    <GridFont location="${options['font']}" size="5"/>
+    <TitleFont location="${font}" size="19"/>
+    <SubTitleFont location="${font}" size="10"/>
+    <DimensionFont location="${font}" size="7"/>
+    <ContourFont location="${font}" size="7"/>
+    <GridFont location="${font}" size="5"/>
     <WMSFormat name="image/png" format="image/png"/>
   </WMS>
   

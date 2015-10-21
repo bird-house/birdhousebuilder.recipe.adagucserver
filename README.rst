@@ -55,11 +55,20 @@ The recipe supports the following options:
    2. ``$ANACONDA_HOME``
    3. ``$HOME/anaconda``
 
+**title**
+  Title of the Web Map Service. Default: Birdhouse ADAGUC WMS
+
+**abstract**
+  Description of the Web Map Service. Default: ADAGUC Web Map Service used in Birdhouse
+
 **port**
    Port used by the Adaguc WMS service. Default: 9002
 
 **data_dir**
-   Path to the data directory with NetCDF files. Default: ``~/.conda/envs/birdhouse/var/cache/pywps``
+   Path to the data directory with NetCDF files. Default: ``~/.conda/envs/birdhouse/var/lib/pywps/outputs``
+
+**enablecache**
+   Enabled caching of WMS requests. Default: false
 
 Example usage
 =============
