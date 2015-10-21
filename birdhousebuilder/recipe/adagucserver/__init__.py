@@ -3,6 +3,7 @@
 """Recipe adagucserver"""
 
 import os
+import subprocess
 from mako.template import Template
 
 from birdhousebuilder.recipe import conda, supervisor, nginx
@@ -32,7 +33,7 @@ class Recipe(object):
         self.options['abstract'] = self.options.get('abstract', 'ADAGUC Web Map Service used in Birdhouse')
         self.options['online_resource'] = 'http://%s:%s/?' % (self.hostname, self.port)
         self.options['font'] = os.path.join(self.prefix, 'share','adagucserver','fonts', 'FreeSans.ttf')
-        self.options['db_params'] = 'databasefile.db'
+        self.options['db_params'] = os.path.join(self.prefix, 'var', 'lib', 'adagucserver', 'adagucserver.db')
         self.options['data_dir'] = os.path.join(self.prefix, 'var', 'lib', 'pywps', 'outputs')
         self.options['enablecache'] = self.options.get('enablecache', 'false')
               
@@ -41,6 +42,7 @@ class Recipe(object):
         installed += list(self.install_pkgs(update))
         installed += list(self.install_app())
         installed += list(self.install_config())
+        installed += list(self.install_db())
         installed += list(self.install_gunicorn())
         installed += list(self.install_supervisor(update))
         installed += list(self.install_nginx(update))
@@ -94,7 +96,19 @@ class Recipe(object):
         with open(output, 'wt') as fp:
             fp.write(result)
         return [output]
- 
+
+    def install_db(self):
+        conda.makedirs(os.path.join(self.prefix, 'var', 'lib', 'adagucserver'))
+        try:
+            subprocess.check_call([
+                os.path.join(self.prefix, 'bin', 'adagucserver'),
+                '--updatedb',
+                '--config',
+                os.path.join(self.prefix, 'etc', 'adagucserver', 'autowms.xml')])
+        except:
+            print "Failed to run adagucserver updatedb"
+        return tuple()
+    
     def install_gunicorn(self):
         """
         install etc/gunicorn/adagucserver.py
