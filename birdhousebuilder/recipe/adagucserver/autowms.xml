@@ -30,7 +30,7 @@
     <DimensionFont location="${font}" size="7"/>
     <ContourFont location="${font}" size="7"/>
     <GridFont location="${font}" size="5"/>
-    <WMSFormat name="image/png" format="image/png"/>
+    <WMSFormat name="image/png" format="image/png32"/>
   </WMS>
   
   <!-- WCS settings -->
@@ -108,7 +108,18 @@
     <palette index="160" red="255"   green="255" blue="0"/> 
     <palette index="240" red="255"   green="0" blue="0"/> 
   </Legend>
-    <!-- Auto style -->
+
+  <!--
+      Style a Layer with alpha transparency for cloudcover.
+
+      https://dev.knmi.nl/projects/adagucserver/wiki/Style_a_Layer_with_alpha_transparency_for_cloudcover
+  -->
+  <Legend name="cloudcover" type="colorRange">
+    <palette index="0"   red="255"   green="255"   blue="255"  alpha="0"/> 
+    <palette index="240" red="255" green="255"   blue="255"    alpha="255"/> 
+  </Legend>
+  
+  <!-- Auto style -->
   <Style name="auto">
     <Legend>multicolor,rainbow</Legend>
     <Scale>0</Scale>
@@ -116,7 +127,40 @@
     <RenderMethod>nearest,bilinear,nearestpoint</RenderMethod>
   </Style>
 
- <!-- Base layers, cascaded from another WMS service -->
+  <!--
+      The following configuration provides several ways for styling a layer using shading and contourlines.
+      
+      https://dev.knmi.nl/projects/adagucserver/wiki/Styling_of_Layers_with_shading_and_contourlines
+  -->
+  <Style name="clt">
+    <Legend fixedclasses="true" tickinterval="500" tickround="1">rainbow</Legend>
+    <Min>0.0</Min>
+    <Max>100</Max>
+    <RenderMethod>nearest,bilinear,contour,contournearest,contourshaded</RenderMethod>
+    <NameMapping name="nearest"   title="clt colors" abstract="Drawing  images with clt colors"/>
+    <NameMapping name="bilinear"   title="clt colors smooth" abstract="Drawing  images with clt colors and bilinear interpolation"/>
+    <NameMapping name="contour"   title="clt contour line" abstract="Drawing  images with clt contour and bilinear interpolation"/>
+    <ContourLine width="1.0" linecolor="#444444" textcolor="#444444" textformatting="%2.0f" classes="0,25,50,75,100"/>
+    <ShadeInterval min="90" max="100"    label="90-100" fillcolor="#00E6FF" />
+  </Style>
+
+  <!-- This is the style for cloudcover -->
+  <Style name="cloudcover">
+    <Legend fixedclasses="true" tickround=".1">cloudcover</Legend>
+    <Min>0.0</Min>
+    <Max>8</Max>
+    <ContourLine width="1" linecolor="#444444" textcolor="#444444" textformatting="%2.1f" classes="3"/>
+    <ContourLine width="3" linecolor="#0000FF" textcolor="#444444" textformatting="%2.1f" classes="4"/>
+    <ShadeInterval min="-1" max="2"    label="&lt;2"    fillcolor="#E6E6FF"/>
+    <ShadeInterval min="2" max="4"    label="2-4"    fillcolor="#B3B3FF"/>
+    <ShadeInterval min="4" max="6"    label="4-6"    fillcolor="#8080FF"/>
+    <ShadeInterval min="6" max="8"    label="&gt;6"    fillcolor="#4C4CFF"/>
+    <RenderMethod>nearest,bilinear,contour,contourbilinear,shaded</RenderMethod>
+    <NameMapping name="nearest"        title="Alpha transparency" abstract="Visualize radar images with alpha transparency on a log scale"/>
+    <NameMapping name="bilinear"        title="Alpha transparency smooth" abstract="Visualize radar images with alpha transparency on a log scale"/>
+  </Style>
+
+  <!-- Base layers, cascaded from another WMS service -->
   
   <Layer type="cascaded" hidden="false">
     <Group value="baselayers"/>
