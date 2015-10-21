@@ -96,6 +96,9 @@ Open your browser with the following URL::
 
   http://localhost:9002?service=WMS&version=1.3.0&request=GetCapabilities
 
+Run a GetCapabilites with an OpenDAP source::
+
+  http://localhost:9002/?service=WMS&version=1.3.0&request=GetCapabilities&source=http://www.esrl.noaa.gov/psd/thredds/dodsC/Datasets/ncep.reanalysis2.dailyavgs/surface/mslp.1979.nc
 
 
 
