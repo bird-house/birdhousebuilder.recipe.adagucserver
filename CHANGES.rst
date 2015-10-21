@@ -1,6 +1,14 @@
 Change History
 **************
 
+0.3.1 (2015-10-21)
+==================
+
+* added more options: title, abstract, enablecache
+* fixed handling of xml output of adagucserver in wsgi appliation
+* cleaned up configs
+* updated readme
+
 0.3.0 (2015-10-20)
 ==================
 
