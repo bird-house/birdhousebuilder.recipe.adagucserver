@@ -1,6 +1,13 @@
 Change History
 **************
 
+0.3.2 (2015-11-12)
+==================
+
+* updated to adagucserver 1.9.6.
+* renamed template autowms.xml to adaguc.autoresource.xml.
+* disabled cascaded base wms layers in template.
+
 0.3.1 (2015-10-21)
 ==================
 
@@ -12,7 +19,7 @@ Change History
 0.3.0 (2015-10-20)
 ==================
 
-* update to adagucserver 1.9.3 with sqlite
+* updated to adagucserver 1.9.3 with sqlite
 
 0.2.1 (2015-03-31)
 ==================

@@ -5,8 +5,8 @@ This module contains the tool of birdhousebuilder.recipe.adagucserver
 from setuptools import find_packages
 from setuptools import setup
 
-version = '0.3.1'
-description = 'A Buildout recipe to install and configure Adaguc Web Mapping Service with Anaconda.'
+version = '0.3.2'
+description = 'A Buildout recipe to install and configure Adaguc Web Map Service with Anaconda.'
 long_description = (
     open('README.rst').read() + '\n' +
     open('AUTHORS.rst').read() + '\n' +
