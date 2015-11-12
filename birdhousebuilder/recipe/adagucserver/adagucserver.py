@@ -1,11 +1,12 @@
 import os
+import sys
 
 def parse_output(output):
     lines = output.split('\n')
     content_type = "text/xml"
     data = '\n'.join(lines)
     for i,line in enumerate(lines):
-        if 'Content-Type' in line:
+        if 'content-type' in line.lower():
             content_type = line.split(':')[1]
             content_type = content_type.strip()
             start_line = i+1
@@ -51,13 +52,16 @@ def app(environ, start_response):
             'SERVER_PORT',
             'SERVER_NAME'
             ]
-        
-        for param in params:
-            os.environ[param] = environ[param]
-        os.environ['GATEWAY_INTERFACE'] = 'CGI/1.1'
 
-        # adaguc parameters
-        output = check_output(['adagucserver'], stderr=STDOUT)
+        env = os.environ.copy()
+        for param in params:
+            env[param] = environ[param]
+        env['GATEWAY_INTERFACE'] = 'CGI/1.1'
+
+        ON_POSIX = 'posix' in sys.builtin_module_names
+
+        # run adagucserver
+        output = check_output(['adagucserver'], stderr=STDOUT, bufsize=8192, close_fds=ON_POSIX, env=env)
         content_type, data = parse_output(output)
         #raise Exception(str(data))
         start_response("200 OK", [
@@ -66,7 +70,7 @@ def app(environ, start_response):
             ])
     except Exception as e:
         data = "Message:<br/>"
-        data += e.message
+        data += str(e.message)
 
         # TODO: returncode 143 = application was killed
             
