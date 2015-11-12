@@ -9,7 +9,7 @@ from mako.template import Template
 from birdhousebuilder.recipe import conda, supervisor, nginx
 
 templ_app = Template(filename=os.path.join(os.path.dirname(__file__), "adagucserver.py"))
-templ_autowms = Template(filename=os.path.join(os.path.dirname(__file__), "autowms.xml"))
+templ_autoresource = Template(filename=os.path.join(os.path.dirname(__file__), "adaguc.autoresource.xml"))
 templ_gunicorn = Template(filename=os.path.join(os.path.dirname(__file__), "gunicorn.conf.py"))
 templ_cmd = Template(
     "${prefix}/bin/gunicorn adagucserver:app -c ${prefix}/etc/gunicorn/adagucserver.py")
@@ -46,7 +46,7 @@ class Recipe(object):
         installed += list(self.install_gunicorn())
         installed += list(self.install_supervisor(update))
         installed += list(self.install_nginx(update))
-        return tuple()
+        return installed
 
     def install_pkgs(self, update=False):
         script = conda.Recipe(
@@ -84,8 +84,8 @@ class Recipe(object):
         conda.makedirs(os.path.join(self.prefix, 'var', 'cache', 'adagucserver'))
 
         # generate config
-        result = templ_autowms.render(**self.options)
-        output = os.path.join(self.prefix, 'etc', 'adagucserver', 'autowms.xml')
+        result = templ_autoresource.render(**self.options)
+        output = os.path.join(self.prefix, 'etc', 'adagucserver', 'adaguc.autoresource.xml')
         conda.makedirs(os.path.dirname(output))
                 
         try:
@@ -104,7 +104,7 @@ class Recipe(object):
                 os.path.join(self.prefix, 'bin', 'adagucserver'),
                 '--updatedb',
                 '--config',
-                os.path.join(self.prefix, 'etc', 'adagucserver', 'autowms.xml')])
+                os.path.join(self.prefix, 'etc', 'adagucserver', 'adaguc.autoresource.xml')])
         except:
             print "Failed to run adagucserver updatedb"
         return tuple()
