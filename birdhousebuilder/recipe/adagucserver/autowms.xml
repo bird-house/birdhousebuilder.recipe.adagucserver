@@ -162,13 +162,13 @@
 
   <!-- Base layers, cascaded from another WMS service -->
   
-  <Layer type="cascaded" hidden="false">
+  <!-- Layer type="cascaded" hidden="false">
     <Group value="baselayers"/>
     <Name force="true">overlay</Name>
     <Title>overlay</Title>
     <WMSLayer service="http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?" layer="world_line"/>
     <LatLonBox minx="-180"  miny="-90" maxx="180" maxy="90"/>
-  </Layer>
+  </Layer -->
   
   <!-- Layer type="cascaded" hidden="false">
     <Group value="baselayers"/>
