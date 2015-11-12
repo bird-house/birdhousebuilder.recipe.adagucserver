@@ -4,7 +4,8 @@ import sys
 def parse_output(output):
     lines = output.split('\n')
     content_type = "text/xml"
-    data = None
+    start_line = 0
+    # parse content-type/header
     for i,line in enumerate(lines):
         if 'content-type' in line.lower():
             content_type = line.split(':')[1]
@@ -12,10 +13,6 @@ def parse_output(output):
             start_line = i+2
             break
     data = '\n'.join(lines[start_line:-1])
-    for i,line in enumerate(lines[start_line:-1]):
-        if line.startswith('<?xml'):
-            data = '\n'.join(lines[i:-1])
-            break
     return content_type,data
 
 def app(environ, start_response):
@@ -65,7 +62,6 @@ def app(environ, start_response):
         # run adagucserver
         output = check_output(['adagucserver'], stderr=STDOUT, bufsize=8192, close_fds=ON_POSIX, env=env)
         content_type, data = parse_output(output)
-        #raise Exception(str(data))
         start_response("200 OK", [
             ("Content-Type", content_type),
             #("Content-Length", str(len(data)))
