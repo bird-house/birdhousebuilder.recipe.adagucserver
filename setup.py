@@ -5,7 +5,7 @@ This module contains the tool of birdhousebuilder.recipe.adagucserver
 from setuptools import find_packages
 from setuptools import setup
 
-version = '0.3.3'
+version = '0.3.4'
 description = 'A Buildout recipe to install and configure Adaguc Web Map Service with Anaconda.'
 long_description = (
     open('README.rst').read() + '\n' +
@@ -38,6 +38,7 @@ setup(name='birdhousebuilder.recipe.adagucserver',
       ],
       keywords='buildout recipe pywps wms birdhouse conda anaconda',
       author='Birdhouse',
+      author_email='',
       url='https://github.com/bird-house/birdhousebuilder.recipe.adagucserver',
       license='BSD',
       packages=find_packages(exclude=['ez_setup']),

@@ -136,11 +136,7 @@ class Recipe(object):
              'command': templ_cmd.render(prefix=self.prefix),
              'directory': os.path.join(self.prefix, 'etc', 'adagucserver')
              })
-        if update == True:
-            script.update()
-        else:
-            script.install()
-        return tuple()
+        return script.install(update)
 
     def install_nginx(self, update=False):
         script = nginx.Recipe(
